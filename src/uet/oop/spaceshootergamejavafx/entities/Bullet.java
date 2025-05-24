@@ -1,6 +1,7 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 /**
  * Skeleton for Bullet. Students must implement movement,
@@ -25,7 +26,7 @@ public class Bullet extends GameObject {
      */
     public Bullet(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
-        // TODO: initialize dead flag if needed
+        this.dead = false;
     }
 
     /**
@@ -33,7 +34,10 @@ public class Bullet extends GameObject {
      */
     @Override
     public void update() {
-        // TODO: move bullet vertically by SPEED
+        y -= SPEED;
+        if(y + HEIGHT <0){
+            dead = true;
+        }
     }
 
     /**
@@ -42,7 +46,8 @@ public class Bullet extends GameObject {
      */
     @Override
     public void render(GraphicsContext gc) {
-        // TODO: draw bullet (e.g., filled rectangle or sprite)
+        gc.setFill(Color.RED);
+        gc.fillRect(x,y,WIDTH,HEIGHT);
     }
 
     /**
@@ -70,7 +75,7 @@ public class Bullet extends GameObject {
      * @param dead true if bullet should be removed
      */
     public void setDead(boolean dead) {
-        // TODO: update dead flag
+        this.dead = dead;
     }
 
     /**
