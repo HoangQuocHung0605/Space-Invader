@@ -1,6 +1,7 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 /**
  * Skeleton for Enemy. Students must implement movement, rendering,
@@ -17,6 +18,7 @@ public class Enemy extends GameObject {
 
     // Flag to indicate if enemy should be removed
     private boolean dead;
+    private Image sprite;
 
     /**
      * Constructs an Enemy at the given coordinates.
@@ -26,6 +28,16 @@ public class Enemy extends GameObject {
     public Enemy(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
         // TODO: load sprite if needed and initialize dead flag
+        this.dead = false;
+        try {
+            this.sprite = new Image(getClass().getResource("/enemy.png").toString());
+        } catch (Exception e) {
+            System.out.println("Image not found" + e.getMessage());
+            sprite = null;
+        }
+        // khởi tạo đối tượng Enemy, dùng khối try catch để lấy hình ảnh.
+        // set tình trạng dead là false.
+
     }
 
     /**
@@ -34,6 +46,8 @@ public class Enemy extends GameObject {
     @Override
     public void update() {
         // TODO: implement vertical movement by SPEED
+        y+=SPEED;
+        // đối tượng Enemy di chuyển dọc với SPEED đã set;
     }
 
     /**
@@ -43,6 +57,13 @@ public class Enemy extends GameObject {
     @Override
     public void render(GraphicsContext gc) {
         // TODO: draw sprite or fallback shape (e.g., colored rectangle)
+        if (sprite != null) {
+            gc.drawImage(sprite, x - WIDTH/2, y- WIDTH/2, WIDTH, HEIGHT);
+        }
+        else {
+            gc.setFill(javafx.scene.paint.Color.RED);
+            gc.fillRect(x - WIDTH/2, y - WIDTH/2, WIDTH, HEIGHT);
+        }
     }
 
     /**
@@ -70,7 +91,10 @@ public class Enemy extends GameObject {
      * @param dead true if enemy should be removed
      */
     public void setDead(boolean dead) {
+        this.dead = dead;
         // TODO: update dead flag
+
+        // Có thể làm hiệu ứng nổ hoặc tăng điểm.
     }
 
     /**

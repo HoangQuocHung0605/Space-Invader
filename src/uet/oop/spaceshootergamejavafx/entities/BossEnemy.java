@@ -1,6 +1,9 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
+import com.sun.javafx.iio.ImageStorage;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+
 import java.util.List;
 
 /**
@@ -18,6 +21,7 @@ public class BossEnemy extends Enemy {
 
     // Horizontal movement speed
     private double horizontalSpeed;
+    private Image sprite;
 
     /**
      * Constructs a BossEnemy at the given coordinates.
@@ -26,6 +30,10 @@ public class BossEnemy extends Enemy {
      */
     public BossEnemy(double x, double y) {
         super(x, y);
+        this.health = 100;
+        this.horizontalSpeed = 2;
+        this.sprite = new Image(getClass().getResource("/boss.png").toString());
+
         // TODO: initialize health, speeds, and load resources
     }
 
@@ -35,6 +43,10 @@ public class BossEnemy extends Enemy {
     @Override
     public void update() {
         // TODO: implement vertical and horizontal movement
+        x += horizontalSpeed;
+        if (x <= WIDTH / 2 || x >= 800 - WIDTH / 2) {
+            horizontalSpeed = -horizontalSpeed;
+        }
     }
 
     /**
@@ -42,6 +54,10 @@ public class BossEnemy extends Enemy {
      */
     public void takeDamage() {
         // TODO: decrement health, mark dead when <= 0
+        health -= 5;
+        if (health <= 0) {
+            setDead(true);
+        }
     }
 
     /**
@@ -50,6 +66,10 @@ public class BossEnemy extends Enemy {
      */
     public void shoot(List<GameObject> newObjects) {
         // TODO: implement shooting logic (spawn EnemyBullet)
+        double bulletX = x;
+        double bulletY = y + HEIGHT /2;
+        newObjects.add(new EnemyBullet(bulletX, bulletY));
+
     }
 
     /**
@@ -58,6 +78,14 @@ public class BossEnemy extends Enemy {
      */
     @Override
     public void render(GraphicsContext gc) {
+
         // TODO: draw boss sprite or placeholder
+        if (sprite != null) {
+            gc.drawImage(sprite, x - WIDTH/2, y- WIDTH/2, WIDTH, HEIGHT);
+        }
+        else {
+            gc.setFill(javafx.scene.paint.Color.RED);
+            gc.fillRect(x - WIDTH/2, y - WIDTH/2, WIDTH, HEIGHT);
+        }
     }
 }
