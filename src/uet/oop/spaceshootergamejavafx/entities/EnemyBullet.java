@@ -1,6 +1,7 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 /**
  * Skeleton for EnemyBullet. Students must implement movement,
@@ -8,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class EnemyBullet extends GameObject {
 
-    // Dimensions of the enemy bullet
+    public static final int SCEEN_HEIGHT = 850;
     public static final int WIDTH = 4;
     public static final int HEIGHT = 20;
 
@@ -25,7 +26,7 @@ public class EnemyBullet extends GameObject {
      */
     public EnemyBullet(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
-        // TODO: initialize dead flag if needed
+        this.dead = false;
     }
 
     /**
@@ -33,7 +34,10 @@ public class EnemyBullet extends GameObject {
      */
     @Override
     public void update() {
-        // TODO: move bullet vertically by SPEED
+        y += SPEED;
+        if(y > SCEEN_HEIGHT){
+            dead = true;
+        }
     }
 
     /**
@@ -42,7 +46,8 @@ public class EnemyBullet extends GameObject {
      */
     @Override
     public void render(GraphicsContext gc) {
-        // TODO: draw bullet (e.g., filled rectangle or sprite)
+        gc.setFill(Color.WHITE);
+        gc.fillRect(x,y,WIDTH,HEIGHT);
     }
 
     /**
@@ -70,7 +75,7 @@ public class EnemyBullet extends GameObject {
      * @param dead true if bullet should be removed
      */
     public void setDead(boolean dead) {
-        // TODO: update dead flag
+        this.dead = dead;
     }
 
     /**
@@ -79,7 +84,6 @@ public class EnemyBullet extends GameObject {
      */
     @Override
     public boolean isDead() {
-        // TODO: return dead flag
         return dead;
     }
 }

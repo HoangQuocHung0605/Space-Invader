@@ -26,6 +26,8 @@ public class PowerUp extends GameObject {
     public PowerUp(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
         // TODO: initialize dead flag, load sprite if needed
+        // Khởi tạo cờ dead - power-up bắt đầu ở trạng thái sống
+        this.dead = false;
     }
 
     /**
@@ -34,6 +36,13 @@ public class PowerUp extends GameObject {
     @Override
     public void update() {
         // TODO: move power-up vertically by SPEED
+        // Di chuyển power-up theo chiều dọc với tốc độ SPEED
+        this.y += SPEED;
+
+        // Kiểm tra nếu power-up đã rơi ra khỏi màn hình
+        if (this.y > 800) {
+            this.dead = true;
+        }
     }
 
     /**
@@ -43,7 +52,16 @@ public class PowerUp extends GameObject {
     @Override
     public void render(GraphicsContext gc) {
         // TODO: draw sprite or fallback (e.g., colored rectangle)
+        // Vẽ hình chữ nhật màu vàng cho power-up
+        gc.setFill(javafx.scene.paint.Color.YELLOW);
+        gc.fillRect(x, y, WIDTH, HEIGHT);
+
+        // Thêm viền để dễ nhìn hơn
+        gc.setStroke(javafx.scene.paint.Color.ORANGE);
+        gc.setLineWidth(2);
+        gc.strokeRect(x, y, WIDTH, HEIGHT);
     }
+
 
     /**
      * Returns the width of the power-up.

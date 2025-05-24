@@ -36,6 +36,20 @@ public class Player extends GameObject{
     public Player(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
         // TODO: initialize health, dead flag, load sprite if needed
+        // Khởi tạo máu cho người chơi
+        this.health = 3; // Thường game cho 3 mạng
+
+        // Khởi tạo cờ dead
+        this.dead = false;
+
+        // Khởi tạo các cờ di chuyển về false
+        this.moveLeft = false;
+        this.moveRight = false;
+        this.moveForward = false;
+        this.moveBackward = false;
+
+        // Tải hình ảnh sprite nếu cần
+        // Ví dụ: this.sprite = new Image("file:src/main/resources/images/player.png");
     }
 
     /**
@@ -78,6 +92,36 @@ public class Player extends GameObject{
     @Override
     public void update() {
         // TODO: implement movement with SPEED and screen bounds
+        // Xử lý di chuyển theo các hướng với tốc độ SPEED
+        if (moveLeft) {
+            x -= SPEED;
+        }
+        if (moveRight) {
+            x += SPEED;
+        }
+        if (moveForward) {
+            y -= SPEED;
+        }
+        if (moveBackward) {
+            y += SPEED;
+        }
+
+        // Giới hạn player trong màn hình (giả sử màn hình 800x600)
+        // Giới hạn theo chiều ngang
+        if (x < 0) {
+            x = 0;
+        }
+        if (x + WIDTH > 800) {
+            x = 800 - WIDTH;
+        }
+
+        // Giới hạn theo chiều dọc
+        if (y < 0) {
+            y = 0;
+        }
+        if (y + HEIGHT > 350) {
+            y = 350 - HEIGHT;
+        }
     }
 
     /**
@@ -86,6 +130,19 @@ public class Player extends GameObject{
     @Override
     public void render(GraphicsContext gc) {
         // TODO: draw sprite or placeholder shape
+        if (sprite != null) {
+            // Vẽ sprite nếu có
+            gc.drawImage(sprite, x, y, WIDTH, HEIGHT);
+        } else {
+            // Vẽ hình chữ nhật thay thế nếu không có sprite
+            gc.setFill(Color.BLUE);
+            gc.fillRect(x, y, WIDTH, HEIGHT);
+
+            // Vẽ viền để dễ nhận biết
+            gc.setStroke(Color.DARKBLUE);
+            gc.setLineWidth(2);
+            gc.strokeRect(x, y, WIDTH, HEIGHT);
+        }
     }
 
     /**
@@ -116,6 +173,16 @@ public class Player extends GameObject{
      */
     public void shoot(List<GameObject> newObjects) {
         // TODO: create and add new Bullet at (x, y - HEIGHT/2)
+        // Tạo viên đạn mới tại vị trí phía trên người chơi
+        double bulletX = x + WIDTH / 2.0; // Giữa người chơi theo chiều ngang
+        double bulletY = y - HEIGHT / 2.0; // Phía trên người chơi
+
+        // Tạo đạn mới (giả sử có lớp Bullet)
+        // Bullet bullet = new Bullet(bulletX, bulletY);
+        // newObjects.add(bullet);
+
+        // Tạm thời comment vì chưa có lớp Bullet
+        System.out.println("Bắn đạn tại vị trí: " + bulletX + ", " + bulletY);
     }
 
     /**
