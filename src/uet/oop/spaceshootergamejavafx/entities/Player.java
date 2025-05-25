@@ -1,7 +1,11 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+
 import java.util.List;
+
+
 
 /**
  * Skeleton for Player. Students must implement movement, rendering,
@@ -27,6 +31,7 @@ public class Player extends GameObject{
 
     // State flag for removal
     private boolean dead;
+    private Image sprite;
 
     /**
      * Constructs a Player at the given position.
@@ -35,6 +40,13 @@ public class Player extends GameObject{
      */
     public Player(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
+        this.dead = false;
+        try {
+            sprite = new Image(getClass().getResource("/player.png").toString());
+        } catch (Exception e) {
+            sprite = null; // fallback nếu không có hình
+        }
+
         // TODO: initialize health, dead flag, load sprite if needed
     }
 
@@ -77,7 +89,20 @@ public class Player extends GameObject{
      */
     @Override
     public void update() {
-        // TODO: implement movement with SPEED and screen bounds
+
+        // Implement movement logic
+        if (moveLeft && x - SPEED > WIDTH / 2) {
+            x -= SPEED;
+        }
+        if (moveRight && x + SPEED < 350 - WIDTH / 2) { // Assuming screen width is 800
+            x += SPEED;
+        }
+        if (moveForward && y - SPEED > HEIGHT / 2) {
+            y -= SPEED;
+        }
+        if (moveBackward && y + SPEED < 800 - HEIGHT / 2) { // Assuming screen height is 600
+            y += SPEED;
+        }
     }
 
     /**
@@ -85,7 +110,14 @@ public class Player extends GameObject{
      */
     @Override
     public void render(GraphicsContext gc) {
-        // TODO: draw sprite or placeholder shape
+
+        // Draw the player sprite if available, else use a placeholder
+        if (sprite != null) {
+            gc.drawImage(sprite, x - WIDTH / 2, y - HEIGHT / 2, WIDTH, HEIGHT);
+        } else {
+            gc.setFill(javafx.scene.paint.Color.BLUE);
+            gc.fillRect(x - WIDTH / 2, y - HEIGHT / 2, WIDTH, HEIGHT);
+        }
     }
 
     /**
@@ -115,7 +147,8 @@ public class Player extends GameObject{
      * Shoots a bullet from the player.
      */
     public void shoot(List<GameObject> newObjects) {
-        // TODO: create and add new Bullet at (x, y - HEIGHT/2)
+
+        newObjects.add(new Bullet(x, y - HEIGHT / 2));
     }
 
     /**

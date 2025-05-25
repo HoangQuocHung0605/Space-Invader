@@ -1,6 +1,7 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 /**
  * Skeleton for PowerUp. Students must implement movement,
@@ -17,6 +18,7 @@ public class PowerUp extends GameObject {
 
     // Flag indicating whether the power-up should be removed
     private boolean dead;
+    private Image sprite;
 
     /**
      * Constructs a PowerUp at the given position.
@@ -25,7 +27,14 @@ public class PowerUp extends GameObject {
      */
     public PowerUp(double x, double y) {
         super(x, y, WIDTH, HEIGHT);
-        // TODO: initialize dead flag, load sprite if needed
+        dead = false;
+
+        try {
+            this.sprite = new Image(getClass().getResource("/powerup.png").toString());
+        } catch (Exception e) {
+            System.out.println("Image not found: " + e.getMessage());
+            this.sprite = null;
+        }
     }
 
     /**
@@ -33,7 +42,10 @@ public class PowerUp extends GameObject {
      */
     @Override
     public void update() {
-        // TODO: move power-up vertically by SPEED
+        y += SPEED;
+        if (y - HEIGHT > 600) {  // Assuming 600 is the height of the game screen
+            dead = true;
+        }
     }
 
     /**
@@ -42,7 +54,12 @@ public class PowerUp extends GameObject {
      */
     @Override
     public void render(GraphicsContext gc) {
-        // TODO: draw sprite or fallback (e.g., colored rectangle)
+        if (sprite != null) {
+            gc.drawImage(sprite, x - WIDTH / 2, y - HEIGHT / 2, WIDTH, HEIGHT);
+        } else {
+            gc.setFill(javafx.scene.paint.Color.YELLOW);
+            gc.fillRect(x - WIDTH / 2, y - HEIGHT / 2, WIDTH, HEIGHT);
+        }
     }
 
     /**
