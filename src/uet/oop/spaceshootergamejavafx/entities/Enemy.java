@@ -3,6 +3,10 @@ package uet.oop.spaceshootergamejavafx.entities;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+// Add to module-info.java:
+// requires javafx.controls;
+// requires javafx.graphics;
+
 /**
  * Skeleton for Enemy. Students must implement movement, rendering,
  * and death state without viewing the original implementation.
