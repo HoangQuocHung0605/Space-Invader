@@ -2,8 +2,14 @@ package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Skeleton for SpaceShooter. Students must implement game loop,
@@ -15,13 +21,35 @@ public class SpaceShooter extends Application {
     public static final int HEIGHT = 800;
     public static int numLives = 3;
 
-    private int score;
-    private boolean bossExists;
-    private boolean reset;
-    private boolean levelUpShown;
-    private boolean gameRunning;
+    //Gán luôn gí trị các biến để tránh lỗi khi ử dụng ngay.
+    private int score = 0;
+    private boolean bossExists = false;
+    private boolean reset = false;
+    private boolean levelUpShown = false;
+    private boolean gameRunning = false;
 
-    // TODO: Declare UI labels, lists of GameObjects, player, root Pane, Scene, Stage
+    // tạo biến giao diện và khung vẽ pane.
+    private Pane root;
+    private Scene scene;
+    private Canvas canvas;
+    private GraphicsContext gc;
+
+    // tạo đôi tượng player và các ôi tượng game còn lại.
+    private Player player;
+    private List<GameObject> gameObjects = new ArrayList<>();
+    private List<GameObject> newObjects = new ArrayList<>();
+    private List<PowerUp> powerUps = new ArrayList<>();
+    private List<Enemy> enemies = new ArrayList<>();
+    private List<Bullet> bullets = new ArrayList<>();
+    private List<EnemyBullet> enemyBullets = new ArrayList<>();
+
+    //UI labels.
+    private Label scoreLabel;
+    private Label livesLabel;
+    private Label messageLabel;
+
+
+    // TODO: Declare UI labels, lists of GameObjects, player, root Pane, Scene, Stage(Done)
 
     public static void main(String[] args) {
         launch(args);
@@ -29,9 +57,70 @@ public class SpaceShooter extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         // TODO: initialize primaryStage, scene, canvas, UI labels, root pane
-        // TODO: set up event handlers
+        //tạo pane và canvas.
+        root = new Pane();
+        canvas = new Canvas(WIDTH, HEIGHT);
+        //Lấy đối tượng GraphicsContext từ Canvas, cho phép thực hiện các thao tác vẽ (draw) lên Canvas
+        gc = canvas.getGraphicsContext2D();
+
+        //set các Label.
+        scoreLabel = new Label("Score" + score);
+        livesLabel = new Label("Lives: " + numLives);
+        messageLabel = new Label();
+
+        //gán cỡ chữ và màu chữ cho Label.
+        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        livesLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        messageLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: yellow;");
+
+        //set vị trí label.
+        scoreLabel.setLayoutX(10);
+        scoreLabel.setLayoutY(10);
+        livesLabel.setLayoutX(WIDTH - 80);
+        livesLabel.setLayoutY(10);
+        messageLabel.setLayoutX(WIDTH / 2.0 - 100);
+        messageLabel.setLayoutY(HEIGHT / 2.0);
+
+        // Thêm tất cả các thành phần (canvas và 3 nhãn) vào Pane root, để hiển thị trên cửa sổ.
+        root.getChildren().addAll(canvas, scoreLabel, livesLabel, messageLabel);
+
+        //Tạo một Scene chứa root, kích thước bằng với WIDTH và HEIGHT đã định nghĩa.
+        scene = new Scene(root, WIDTH, HEIGHT);
+
+        // gán scence và ddăt Title
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Space Shooter");
+
+        primaryStage.setResizable(false);
+        primaryStage.show();
+
+
+        // thao tasc up,down,right left khi nhap tu ban phim.
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case LEFT -> player.setMoveLeft(true);
+                case RIGHT -> player.setMoveRight(true);
+                case DOWN -> player.setMoveBackward(true);
+                case UP -> player.setMoveForward(true);
+                case SPACE -> player.shoot(bullets); // Assuming `shoot` method adds bullet to bullets list
+            }
+        });
+
+        // set lai false khi tha phim.
+        scene.setOnKeyReleased(event -> {
+            switch (event.getCode()) {
+                case LEFT -> player.setMoveLeft(false);
+                case RIGHT -> player.setMoveRight(false);
+                case DOWN -> player.setMoveBackward(false);
+                case UP -> player.setMoveForward(false);
+            }
+        });
+        
         // TODO: initialize gameObjects list with player
+
+
         // TODO: create menu and switch to menu scene
         // TODO: set up AnimationTimer game loop and start it
         // TODO: show primaryStage

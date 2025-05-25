@@ -146,9 +146,9 @@ public class Player extends GameObject{
     /**
      * Shoots a bullet from the player.
      */
-    public void shoot(List<GameObject> newObjects) {
+    public void shoot(List<Bullet> bullets) {
 
-        newObjects.add(new Bullet(x, y - HEIGHT / 2));
+        bullets.add(new Bullet(x, y - HEIGHT / 2));
     }
 
     /**
