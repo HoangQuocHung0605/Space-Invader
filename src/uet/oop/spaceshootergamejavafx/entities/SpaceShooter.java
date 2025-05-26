@@ -1,9 +1,11 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -48,6 +50,8 @@ public class SpaceShooter extends Application {
     private Label livesLabel;
     private Label messageLabel;
 
+    private Stage primaryStage;
+
 
     // TODO: Declare UI labels, lists of GameObjects, player, root Pane, Scene, Stage(Done)
 
@@ -58,77 +62,22 @@ public class SpaceShooter extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        // TODO: initialize primaryStage, scene, canvas, UI labels, root pane
-        //tạo pane và canvas.
-        root = new Pane();
-        canvas = new Canvas(WIDTH, HEIGHT);
-        //Lấy đối tượng GraphicsContext từ Canvas, cho phép thực hiện các thao tác vẽ (draw) lên Canvas
-        gc = canvas.getGraphicsContext2D();
+        this.primaryStage = primaryStage;
+        Pane menuRoot = createMenu();
+        Scene menuScene = new Scene(menuRoot, WIDTH, HEIGHT);
 
-        //set các Label.
-        scoreLabel = new Label("Score" + score);
-        livesLabel = new Label("Lives: " + numLives);
-        messageLabel = new Label();
-
-        //gán cỡ chữ và màu chữ cho Label.
-        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        livesLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        messageLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: yellow;");
-
-        //set vị trí label.
-        scoreLabel.setLayoutX(10);
-        scoreLabel.setLayoutY(10);
-        livesLabel.setLayoutX(WIDTH - 80);
-        livesLabel.setLayoutY(10);
-        messageLabel.setLayoutX(WIDTH / 2.0 - 100);
-        messageLabel.setLayoutY(HEIGHT / 2.0);
-
-        // Thêm tất cả các thành phần (canvas và 3 nhãn) vào Pane root, để hiển thị trên cửa sổ.
-        root.getChildren().addAll(canvas, scoreLabel, livesLabel, messageLabel);
-
-        //Tạo một Scene chứa root, kích thước bằng với WIDTH và HEIGHT đã định nghĩa.
-        scene = new Scene(root, WIDTH, HEIGHT);
-
-        // gán scence và ddăt Title
-        primaryStage.setScene(scene);
         primaryStage.setTitle("Space Shooter");
-
         primaryStage.setResizable(false);
+        primaryStage.setScene(menuScene);
         primaryStage.show();
 
-
-        // thao tasc up,down,right left khi nhap tu ban phim.
-        scene.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case LEFT -> player.setMoveLeft(true);
-                case RIGHT -> player.setMoveRight(true);
-                case DOWN -> player.setMoveBackward(true);
-                case UP -> player.setMoveForward(true);
-                case SPACE -> player.shoot(bullets); // Assuming `shoot` method adds bullet to bullets list
-            }
-        });
-
-        // set lai false khi tha phim.
-        scene.setOnKeyReleased(event -> {
-            switch (event.getCode()) {
-                case LEFT -> player.setMoveLeft(false);
-                case RIGHT -> player.setMoveRight(false);
-                case DOWN -> player.setMoveBackward(false);
-                case UP -> player.setMoveForward(false);
-            }
-        });
-        
-        // TODO: initialize gameObjects list with player
-
-
-        // TODO: create menu and switch to menu scene
-        // TODO: set up AnimationTimer game loop and start it
-        // TODO: show primaryStage
     }
 
     // Game mechanics stubs
 
     private void spawnEnemy() {
+
+
         // TODO: implement enemy and boss spawn logic based on score
     }
 
@@ -163,12 +112,52 @@ public class SpaceShooter extends Application {
     }
 
     private void initEventHandlers(Scene scene) {
-        // TODO: set OnKeyPressed and OnKeyReleased for movement and shooting
+        // thao tasc up,down,right left khi nhap tu ban phim.
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case LEFT -> player.setMoveLeft(true);
+                case RIGHT -> player.setMoveRight(true);
+                case DOWN -> player.setMoveBackward(true);
+                case UP -> player.setMoveForward(true);
+                case SPACE -> player.shoot(bullets); // Assuming `shoot` method adds bullet to bullets list
+            }
+        });
+
+        // set lai false khi tha phim.
+        scene.setOnKeyReleased(event -> {
+            switch (event.getCode()) {
+                case LEFT -> player.setMoveLeft(false);
+                case RIGHT -> player.setMoveRight(false);
+                case DOWN -> player.setMoveBackward(false);
+                case UP -> player.setMoveForward(false);
+            }
+        });
+
+
     }
 
     private Pane createMenu() {
         // TODO: build and return main menu pane with styled buttons
-        return new Pane();
+        Pane menuRoot = new Pane();
+        menuRoot.setStyle("-fx-background-color: black;");
+
+        Label title = new Label("SPACE SHOOTER");
+        title.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
+        title.setLayoutX(WIDTH / 2.0 - 120);
+        title.setLayoutY(100);
+
+        Button startButton = new Button("Start Game");
+        startButton.setLayoutX(WIDTH / 2.0 - 50);
+        startButton.setLayoutY(250);
+        startButton.setOnAction(e -> startGame());
+
+        Button instructionsButton = new Button("Instructions");
+        instructionsButton.setLayoutX(WIDTH / 2.0 - 50);
+        instructionsButton.setLayoutY(300);
+        instructionsButton.setOnAction(e -> showInstructions());
+
+        menuRoot.getChildren().addAll(title, startButton, instructionsButton);
+        return menuRoot;
     }
 
     private void showInstructions() {
@@ -180,6 +169,55 @@ public class SpaceShooter extends Application {
     }
 
     private void startGame() {
-        // TODO: set gameRunning to true and switch to game scene
+        gameRunning = true;
+        score = 0;
+        numLives = 3;
+
+        // Khởi tạo root và canvas
+        root = new Pane();
+        canvas = new Canvas(WIDTH, HEIGHT);
+        gc = canvas.getGraphicsContext2D();
+
+        // Khởi tạo các label
+        scoreLabel = new Label("Score: " + score);
+        livesLabel = new Label("Lives: " + numLives);
+        messageLabel = new Label();
+
+        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        livesLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        messageLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: yellow;");
+
+        scoreLabel.setLayoutX(10);
+        scoreLabel.setLayoutY(10);
+        livesLabel.setLayoutX(WIDTH - 80);
+        livesLabel.setLayoutY(10);
+        messageLabel.setLayoutX(WIDTH / 2.0 - 100);
+        messageLabel.setLayoutY(HEIGHT / 2.0);
+
+        root.getChildren().addAll(canvas, scoreLabel, livesLabel, messageLabel);
+
+        scene = new Scene(root, WIDTH, HEIGHT);
+        primaryStage.setScene(scene);
+
+        // Khởi tạo player và danh sách
+        player = new Player(WIDTH / 2.0, HEIGHT - 50);
+        gameObjects.clear();
+        bullets.clear();
+        enemies.clear();
+        powerUps.clear();
+        enemyBullets.clear();
+        gameObjects.add(player);
+
+        // Xử lý bàn phím
+        initEventHandlers(scene);
+
+        // Game loop
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+            }
+        };
+        timer.start();
     }
+
 }
