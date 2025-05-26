@@ -9,7 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 
+import java.awt.*;
+import java.awt.Button;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -160,9 +165,41 @@ public class SpaceShooter extends Application {
         return menuRoot;
     }
 
-    private void showInstructions() {
-        // TODO: display instructions dialog
-    }
+   private void showInstructions() {
+       //tao 1 stage moi de huong dan
+       Stage instructionsStage = new Stage();
+       instructionsStage.initOwner(primaryStage);
+       instructionsStage.setTitle("How to play");
+       // noi dung huong dan
+       Label instructionsLabel = new Label(
+               "SPACE SHOOTER - INSTRUCTIONS\n\n" +
+                       "• Use ARROW KEYS to move your ship:\n" +
+                       "   ↑ (UP): Move forward\n" +
+                       "   ↓ (DOWN): Move backward\n" +
+                       "   ← (LEFT): Move left\n" +
+                       "   → (RIGHT): Move right\n\n" +
+                       "• Press SPACE to shoot bullets.\n\n" +
+                       "• Avoid enemies and their bullets.\n" +
+                       "• Collect power-ups for bonuses.\n\n" +
+                       "GOAL: Survive as long as possible and defeat the boss!"
+       );
+       //tuy chinh giao dien
+       instructionsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-font-weight: bold;");
+       instructionsLabel.setWrapText(true);
+
+       Button closeButton = new Button("Close");
+       closeButton.setOnAction(e -> instructionsStage.close());
+
+       VBox layout = new VBox(20, instructionsLabel, closeButton);
+       layout.setAlignment(Pos.CENTER);
+       layout.setPadding(new Insets(20));
+       layout.setStyle("-fx-background-color: #333;");
+
+       Scene instructionsScene = new Scene(layout, 400, 400);
+       instructionsStage.setScene(instructionsScene);
+       instructionsStage.show();
+   }
+
 
     private void showTempMessage(String message, double x, double y, double duration) {
         // TODO: show temporary on-screen message for duration seconds
