@@ -47,6 +47,7 @@ public class BossEnemy extends Enemy {
         if (x <= WIDTH / 2 || x >= 800 - WIDTH / 2) {
             horizontalSpeed = -horizontalSpeed;
         }
+
     }
 
     /**
@@ -62,13 +63,12 @@ public class BossEnemy extends Enemy {
 
     /**
      * Boss fires bullets towards the player.
-     * @param newObjects list to which new bullets are added
      */
-    public void shoot(List<GameObject> newObjects) {
+    public void shoot(List<EnemyBullet> enemyBullets) {
         // TODO: implement shooting logic (spawn EnemyBullet)
         double bulletX = x;
         double bulletY = y + HEIGHT /2;
-        newObjects.add(new EnemyBullet(bulletX, bulletY));
+        enemyBullets.add(new EnemyBullet(bulletX, bulletY));
 
     }
 
