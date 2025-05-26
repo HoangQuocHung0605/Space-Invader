@@ -30,7 +30,7 @@ public class PowerUp extends GameObject {
         dead = false;
 
         try {
-            this.sprite = new Image(getClass().getResource("/powerup.png").toString());
+            this.sprite = new Image(getClass().getResource("/img/powerup.png").toString());
         } catch (Exception e) {
             System.out.println("Image not found: " + e.getMessage());
             this.sprite = null;
