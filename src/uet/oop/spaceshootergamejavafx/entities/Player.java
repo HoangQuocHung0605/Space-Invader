@@ -42,7 +42,7 @@ public class Player extends GameObject{
         super(x, y, WIDTH, HEIGHT);
         this.dead = false;
         try {
-            sprite = new Image(getClass().getResource("/img/player.png").toString());
+            sprite = new Image(getClass().getResource("/img/player.jpg").toString());
         } catch (Exception e) {
             sprite = null; // fallback nếu không có hình
         }

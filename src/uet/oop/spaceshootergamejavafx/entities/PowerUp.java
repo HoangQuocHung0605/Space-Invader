@@ -1,8 +1,8 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-
 /**
  * Skeleton for PowerUp. Students must implement movement,
  * rendering, and state management.
@@ -22,6 +22,7 @@ public class PowerUp extends GameObject {
 
     /**
      * Constructs a PowerUp at the given position.
+     *
      * @param x initial X position
      * @param y initial Y position
      */
@@ -50,6 +51,7 @@ public class PowerUp extends GameObject {
 
     /**
      * Renders the power-up on the canvas.
+     *
      * @param gc the GraphicsContext to draw on
      */
     @Override
@@ -64,6 +66,7 @@ public class PowerUp extends GameObject {
 
     /**
      * Returns the width of the power-up.
+     *
      * @return WIDTH
      */
     @Override
@@ -74,6 +77,7 @@ public class PowerUp extends GameObject {
 
     /**
      * Returns the height of the power-up.
+     *
      * @return HEIGHT
      */
     @Override
@@ -84,6 +88,7 @@ public class PowerUp extends GameObject {
 
     /**
      * Checks whether the power-up should be removed.
+     *
      * @return true if dead
      */
     @Override
@@ -94,6 +99,7 @@ public class PowerUp extends GameObject {
 
     /**
      * Marks this power-up as dead (to be removed).
+     *
      * @param dead true if should be removed
      */
     public void setDead(boolean dead) {

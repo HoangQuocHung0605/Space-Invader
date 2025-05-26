@@ -86,27 +86,132 @@ public class SpaceShooter extends Application {
 
     // Game mechanics stubs
 
+
+    private long lastEnemySpawnTime = 0;
+    private static final long ENEMY_SPAWN_INTERVAL = 1_000_000_000; // 1 giây
+
     private void spawnEnemy() {
+        long now = System.nanoTime();
+        if (now - lastEnemySpawnTime >= ENEMY_SPAWN_INTERVAL) {
+            double x = Math.random() * (WIDTH - 40); // tránh enemy vượt khung
+            Enemy enemy = new Enemy(x, -50);
+            enemies.add(enemy);
+            lastEnemySpawnTime = now;
+        }
 
-
-        // TODO: implement enemy and boss spawn logic based on score
+        if (score > 100 && !bossExists) {
+            spawnBossEnemy();
+        }
     }
+
+
+    private long lastPowerUpSpawnTime = 0;
+    private static final long POWERUP_SPAWN_INTERVAL = 15_000_000_000L; // 15 giây
 
     private void spawnPowerUp() {
-        // TODO: implement power-up spawn logic
+        long now = System.nanoTime();
+        if (now - lastPowerUpSpawnTime >= POWERUP_SPAWN_INTERVAL) {
+            double x = Math.random() * (WIDTH - 30);
+            PowerUp powerUp = new PowerUp(x, -30);
+            powerUps.add(powerUp);
+            lastPowerUpSpawnTime = now;
+        }
     }
 
+
     private void spawnBossEnemy() {
+        BossEnemy boss = new BossEnemy(WIDTH / 2.0 - 50, -100); // ví dụ boss to
+        enemies.add(boss);
+        bossExists = true;
         // TODO: implement boss-only spawn logic
     }
 
     private void checkCollisions() {
-        // TODO: detect and handle collisions between bullets, enemies, power-ups, player
+        // 1. Bullet va chạm với Enemy (thường và boss)
+        for (Bullet bullet : bullets) {
+            if (bullet.isDead()) continue;
+            for (Enemy enemy : enemies) {
+                if (enemy.isDead()) continue;
+
+                if (bullet.getBounds().intersects(enemy.getBounds())) {
+                    bullet.setDead(true);
+                    if (enemy instanceof BossEnemy boss) {
+                        boss.takeDamage();  // boss trừ 1 máu
+                        if (boss.isDead()) {
+                            score += 100;
+                            bossExists = false;
+                        }
+                    } else {
+                        enemy.setDead(true);
+                        score += 10;
+                    }
+                    break;  // bullet chỉ trúng 1 enemy 1 lần
+                }
+            }
+        }
+
+        // 2. EnemyBullet va chạm Player
+        for (EnemyBullet enemyBullet : enemyBullets) {
+            if (enemyBullet.isDead() || player.isDead()) continue;
+
+            if (enemyBullet.getBounds().intersects(player.getBounds())) {
+                enemyBullet.setDead(true);
+                numLives--;
+                if (numLives <= 0) {
+                    player.setDead(true);
+                    resetGame();
+                } else {
+                    // Bạn có thể thêm hiệu ứng hoặc hồi sinh tạm thời player
+                }
+            }
+        }
+
+        // 3. Player va chạm PowerUp
+        for (PowerUp powerUp : powerUps) {
+            if (powerUp.isDead() || player.isDead()) continue;
+
+            if (powerUp.getBounds().intersects(player.getBounds())) {
+                powerUp.setDead(true);
+                // Áp dụng hiệu ứng power-up cho player, ví dụ tăng điểm hoặc máu
+                score += 20;
+                numLives = Math.min(numLives + 1, 5); // max 5 lives giả sử
+            }
+        }
+
+        // 4. Enemy va chạm Player (va chạm trực tiếp)
+        for (Enemy enemy : enemies) {
+            if (enemy.isDead() || player.isDead()) continue;
+
+            if (enemy.getBounds().intersects(player.getBounds())) {
+                enemy.setDead(true);
+                numLives--;
+                if (numLives <= 0) {
+                    player.setDead(true);
+                    resetGame();
+                }
+            }
+        }
+
+        // Có thể thêm các va chạm khác nếu cần (ví dụ enemyBullet va chạm powerUp,...)
+
     }
 
+
     private void checkEnemiesReachingBottom() {
-        // TODO: handle enemies reaching bottom of screen (reduce lives, respawn, reset game)
+        List<Enemy> enemiesToRemove = new ArrayList<>();
+        for (Enemy enemy : enemies) {
+            if (enemy.getY() >= HEIGHT) {
+                enemiesToRemove.add(enemy);
+                numLives--; // trừ mạng khi enemy vượt đáy
+                if (numLives <= 0) {
+                    resetGame(); // gọi reset khi hết mạng
+                    break;
+                }
+            }
+        }
+        enemies.removeAll(enemiesToRemove);
     }
+
 
     // UI and game state methods
 
@@ -301,6 +406,92 @@ public class SpaceShooter extends Application {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                if (!gameRunning) return;
+                if (now - lastEnemySpawnTime >= ENEMY_SPAWN_INTERVAL) {
+                    spawnEnemy(); // bạn tự viết hàm này
+                    lastEnemySpawnTime = now;
+                }
+
+                // Spawn PowerUp
+                if (now - lastPowerUpSpawnTime >= POWERUP_SPAWN_INTERVAL) {
+                    spawnPowerUp(); // bạn tự viết hàm này
+                    lastPowerUpSpawnTime = now;
+                }
+
+                // Cập nhật
+                player.update();
+
+                // Cập nhật enemies, chỉ với enemy chưa chết
+                enemies.removeIf(Enemy::isDead); // Xóa enemy đã chết
+                for (Enemy e : enemies) {
+                    if (!e.isDead()) {
+                        e.update();
+                    }
+                }
+
+                // Cập nhật bullets, xóa bullet đã chết
+                bullets.removeIf(Bullet::isDead);
+                for (Bullet b : bullets) {
+                    if (!b.isDead()) {
+                        b.update();
+                    }
+                }
+
+                // Tương tự với enemyBullets và powerUps
+                enemyBullets.removeIf(EnemyBullet::isDead);
+                for (EnemyBullet eb : enemyBullets) {
+                    if (!eb.isDead()) {
+                        eb.update();
+                    }
+                }
+
+                powerUps.removeIf(PowerUp::isDead);
+                for (PowerUp p : powerUps) {
+                    if (!p.isDead()) {
+                        p.update();
+                    }
+                }
+
+                // Kiểm tra va chạm
+                checkCollisions();
+
+                // Kiểm tra enemy tới đáy màn hình
+                checkEnemiesReachingBottom();
+
+                // Vẽ lại màn hình
+                gc.clearRect(0, 0, WIDTH, HEIGHT);
+
+                if (!player.isDead()) {
+                    player.render(gc);
+                }
+
+                for (Enemy e : enemies) {
+                    if (!e.isDead()) {
+                        e.render(gc);
+                    }
+                }
+
+                for (Bullet b : bullets) {
+                    if (!b.isDead()) {
+                        b.render(gc);
+                    }
+                }
+
+                for (EnemyBullet eb : enemyBullets) {
+                    if (!eb.isDead()) {
+                        eb.render(gc);
+                    }
+                }
+
+                for (PowerUp p : powerUps) {
+                    if (!p.isDead()) {
+                        p.render(gc);
+                    }
+                }
+
+                // Cập nhật UI
+                scoreLabel.setText("Score: " + score);
+                livesLabel.setText("Lives: " + numLives);
             }
         };
         timer.start();
