@@ -34,7 +34,7 @@ public class Enemy extends GameObject {
         // TODO: load sprite if needed and initialize dead flag
         this.dead = false;
         try {
-            this.sprite = new Image(getClass().getResource("/img/enemy.png").toString());
+            this.sprite = new Image(getClass().getResource("/enemy.png").toString());
         } catch (Exception e) {
             System.out.println("Image not found" + e.getMessage());
             sprite = null;
