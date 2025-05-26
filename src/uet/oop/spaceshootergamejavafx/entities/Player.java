@@ -47,9 +47,6 @@ public class Player extends GameObject{
         this.moveRight = false;
         this.moveForward = false;
         this.moveBackward = false;
-
-        // Tải hình ảnh sprite nếu cần
-        // Ví dụ: this.sprite = new Image("file:src/main/resources/images/player.png");
     }
 
     /**
@@ -106,8 +103,6 @@ public class Player extends GameObject{
             y += SPEED;
         }
 
-        // Giới hạn player trong màn hình (giả sử màn hình 800x600)
-        // Giới hạn theo chiều ngang
         if (x < 0) {
             x = 0;
         }

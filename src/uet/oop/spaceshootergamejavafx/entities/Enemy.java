@@ -98,7 +98,6 @@ public class Enemy extends GameObject {
         this.dead = dead;
         // TODO: update dead flag
 
-        // Có thể làm hiệu ứng nổ hoặc tăng điểm.
     }
 
     /**
