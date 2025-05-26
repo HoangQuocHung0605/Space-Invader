@@ -12,11 +12,16 @@ import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.animation.FadeTransition;
+import javafx.util.Duration;
 
 import java.awt.*;
 import java.awt.Button;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
+import static jdk.internal.org.jline.terminal.Terminal.MouseTracking.Button;
 
 /**
  * Skeleton for SpaceShooter. Students must implement game loop,
@@ -105,15 +110,50 @@ public class SpaceShooter extends Application {
     // UI and game state methods
 
     private void showLosingScreen() {
-        // TODO: display Game Over screen with score and buttons
+        Pane losingPane = new Pane();
+        losingPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+        //them hieu ung fade in
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5),losingPane);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
+        //Label "Game over"
+        Label gameOverLabel = new Label("GAME OVER");
+        gameOverLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: red; -fx-font-weight: bold;");
+        gameOverLabel.setLayoutX(WIDTH / 2 - 100);
+        gameOverLabel.setLayoutY(HEIGHT / 2 - 100);
+        //Label diem so
+        Label finalScoreLabel = new Label("Final Score: " + score);
+        finalScoreLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+        finalScoreLabel.setLayoutX(WIDTH / 2 - 80);
+        finalScoreLabel.setLayoutY(HEIGHT / 2 - 30);
+        // nut play again
+        Button playAgainButton = new Button("Play Again");
+        playAgainButton.setStyle("-fx-font-size: 16px; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+        playAgainButton.setLayoutX(WIDTH / 2 - 100);
+        playAgainButton.setLayoutY(HEIGHT / 2 + 20);
+        playAgainButton.setOnAction(e -> restartGame());
+        // nut back to menu
+        Button menuButton = new Button("Back to Menu");
+        menuButton.setStyle("-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;");
+        menuButton.setLayoutX(WIDTH / 2 - 100);
+        menuButton.setLayoutY(HEIGHT / 2 + 70);
+        menuButton.setOnAction(e -> {
+            primaryStage.setScene(new Scene(createMenu(), WIDTH, HEIGHT));
+        });
+
+        losingPane.getChildren().addAll(gameOverLabel, finalScoreLabel, playAgainButton, menuButton);
+        root.getChildren().add(losingPane);
     }
+
 
     private void restartGame() {
         // TODO: reset gameObjects, lives, score and switch back to game scene
     }
 
     private void resetGame() {
-        // TODO: stop game loop and call showLosingScreen
+        gameRunning = false;
+        showLosingScreen();
     }
 
     private void initEventHandlers(Scene scene) {
