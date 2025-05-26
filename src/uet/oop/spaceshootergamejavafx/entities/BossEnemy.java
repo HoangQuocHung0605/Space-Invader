@@ -32,7 +32,7 @@ public class BossEnemy extends Enemy {
         super(x, y);
         this.health = 100;
         this.horizontalSpeed = 2;
-        this.sprite = new Image(getClass().getResource("/img/boss.png").toString());
+        this.sprite = new Image(getClass().getResource("/img/boss.png").toExternalForm());
 
         // TODO: initialize health, speeds, and load resources
     }

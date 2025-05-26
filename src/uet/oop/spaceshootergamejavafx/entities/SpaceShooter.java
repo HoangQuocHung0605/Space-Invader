@@ -1,17 +1,28 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 /**
  * Skeleton for SpaceShooter. Students must implement game loop,
@@ -100,6 +111,40 @@ public class SpaceShooter extends Application {
     // UI and game state methods
 
     private void showLosingScreen() {
+        Pane losingPane = new Pane();
+        losingPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+        //them hieu ung fade in
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5),losingPane);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
+        //Label "Game over"
+        Label gameOverLabel = new Label("GAME OVER");
+        gameOverLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: red; -fx-font-weight: bold;");
+        gameOverLabel.setLayoutX(WIDTH / 2 - 100);
+        gameOverLabel.setLayoutY(HEIGHT / 2 - 100);
+        //Label diem so
+        Label finalScoreLabel = new Label("Final Score: " + score);
+        finalScoreLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+        finalScoreLabel.setLayoutX(WIDTH / 2 - 80);
+        finalScoreLabel.setLayoutY(HEIGHT / 2 - 30);
+        // nut play again
+        Button playAgainButton = new Button("Play Again");
+        playAgainButton.setStyle("-fx-font-size: 16px; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+        playAgainButton.setLayoutX(WIDTH / 2 - 100);
+        playAgainButton.setLayoutY(HEIGHT / 2 + 20);
+        playAgainButton.setOnAction(e -> restartGame());
+        // nut back to menu
+        Button menuButton = new Button("Back to Menu");
+        menuButton.setStyle("-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;");
+        menuButton.setLayoutX(WIDTH / 2 - 100);
+        menuButton.setLayoutY(HEIGHT / 2 + 70);
+        menuButton.setOnAction(e -> {
+            primaryStage.setScene(new Scene(createMenu(), WIDTH, HEIGHT));
+        });
+
+        losingPane.getChildren().addAll(gameOverLabel, finalScoreLabel, playAgainButton, menuButton);
+        root.getChildren().add(losingPane);
         // TODO: display Game Over screen with score and buttons
     }
 
@@ -108,6 +153,8 @@ public class SpaceShooter extends Application {
     }
 
     private void resetGame() {
+        gameRunning = false;
+        showLosingScreen();
         // TODO: stop game loop and call showLosingScreen
     }
 
@@ -156,12 +203,51 @@ public class SpaceShooter extends Application {
         instructionsButton.setLayoutY(300);
         instructionsButton.setOnAction(e -> showInstructions());
 
-        menuRoot.getChildren().addAll(title, startButton, instructionsButton);
+        Button closeButton = new Button("Close");
+        closeButton.setLayoutX(WIDTH / 2.0 - 50);
+        closeButton.setLayoutY(350);
+        closeButton.setOnAction(e -> Platform.exit());
+
+        menuRoot.getChildren().addAll(title, startButton, instructionsButton, closeButton);
         return menuRoot;
     }
 
     private void showInstructions() {
         // TODO: display instructions dialog
+        //tao 1 stage moi de huong dan
+        Stage instructionsStage = new Stage();
+        instructionsStage.initOwner(primaryStage);
+        instructionsStage.setTitle("How to play");
+        // noi dung huong dan
+        Label instructionsLabel = new Label(
+                "SPACE SHOOTER - INSTRUCTIONS\n\n" +
+                        "• Use ARROW KEYS to move your ship:\n" +
+                        "   ↑ (UP): Move forward\n" +
+                        "   ↓ (DOWN): Move backward\n" +
+                        "   ← (LEFT): Move left\n" +
+                        "   → (RIGHT): Move right\n\n" +
+                        "• Press SPACE to shoot bullets.\n\n" +
+                        "• Avoid enemies and their bullets.\n" +
+                        "• Collect power-ups for bonuses.\n\n" +
+                        "GOAL: Survive as long as possible and defeat the boss!"
+        );
+        //tuy chinh giao dien
+        instructionsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-font-weight: bold;");
+        instructionsLabel.setWrapText(true);
+
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> instructionsStage.close());
+
+        VBox layout = new VBox(20, instructionsLabel, closeButton);
+        layout.setAlignment(Pos.CENTER);
+        layout.setPadding(new Insets(20));
+        layout.setStyle("-fx-background-color: #333;");
+
+        Scene instructionsScene = new Scene(layout, 400, 400);
+        instructionsStage.setScene(instructionsScene);
+        instructionsStage.show();
+
+
     }
 
     private void showTempMessage(String message, double x, double y, double duration) {
