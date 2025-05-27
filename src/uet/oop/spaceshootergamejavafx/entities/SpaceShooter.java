@@ -148,7 +148,21 @@ public class SpaceShooter extends Application {
 
 
     private void restartGame() {
-        // TODO: reset gameObjects, lives, score and switch back to game scene
+        score = 0;
+        numLives = 3;
+        bossExists = false;
+        levelUpShown = false;
+        reset = false;
+
+        gameObjects.clear();
+        bullets.clear();
+        enemies.clear();
+        powerUps.clear();
+        enemyBullets.clear();
+
+        player = new Player(WIDTH , HEIGHT);
+        gameObjects.add(player);
+        startGame();
     }
 
     private void resetGame() {
