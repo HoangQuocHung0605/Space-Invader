@@ -2,6 +2,7 @@ package uet.oop.spaceshootergamejavafx.entities;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -21,6 +22,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 
@@ -55,6 +57,7 @@ public class SpaceShooter extends Application {
     private List<Enemy> enemies = new ArrayList<>();
     private List<Bullet> bullets = new ArrayList<>();
     private List<EnemyBullet> enemyBullets = new ArrayList<>();
+    private List<BossEnemy> bossEnemies = new ArrayList<>();
 
     //UI labels.
     private Label scoreLabel;
@@ -63,6 +66,8 @@ public class SpaceShooter extends Application {
 
     private Stage primaryStage;
 
+    private Image backgroundImage = new Image(getClass().getResource("/img/back_2.png").toString());
+    private AnimationTimer gameTimer;
 
     // TODO: Declare UI labels, lists of GameObjects, player, root Pane, Scene, Stage(Done)
 
@@ -92,14 +97,18 @@ public class SpaceShooter extends Application {
 
     private void spawnEnemy() {
         long now = System.nanoTime();
-        if (now - lastEnemySpawnTime >= ENEMY_SPAWN_INTERVAL) {
-            double x = Math.random() * (WIDTH - 40); // tránh enemy vượt khung
+        if ( !bossExists && now - lastEnemySpawnTime >= ENEMY_SPAWN_INTERVAL) {
+            double enemyWidth = 40;
+            double margin = 20; // khoảng cách an toàn từ mép trái/phải
+
+            double x = margin + Math.random() * (WIDTH - 2 * margin - enemyWidth);
             Enemy enemy = new Enemy(x, -50);
             enemies.add(enemy);
             lastEnemySpawnTime = now;
         }
 
         if (score > 100 && !bossExists) {
+            bossExists = true;
             spawnBossEnemy();
         }
     }
@@ -120,32 +129,51 @@ public class SpaceShooter extends Application {
 
 
     private void spawnBossEnemy() {
-        BossEnemy boss = new BossEnemy(WIDTH / 2.0 - 50, -100); // ví dụ boss to
-        enemies.add(boss);
-        bossExists = true;
-        // TODO: implement boss-only spawn logic
+        BossEnemy boss = new BossEnemy(WIDTH / 2.0 - 50, 150);
+        bossEnemies.add(boss);
+        System.out.printf("BOSS spawned\n");
     }
 
     private void checkCollisions() {
-        // 1. Bullet va chạm với Enemy (thường và boss)
         for (Bullet bullet : bullets) {
             if (bullet.isDead()) continue;
+
             for (Enemy enemy : enemies) {
                 if (enemy.isDead()) continue;
 
                 if (bullet.getBounds().intersects(enemy.getBounds())) {
                     bullet.setDead(true);
-                    if (enemy instanceof BossEnemy boss) {
-                        boss.takeDamage();  // boss trừ 1 máu
-                        if (boss.isDead()) {
-                            score += 100;
-                            bossExists = false;
-                        }
-                    } else {
-                        enemy.setDead(true);
-                        score += 10;
+                    enemy.setDead(true);
+                    score += 10;
+                    break; // Bullet chỉ trúng 1 enemy
+                }
+            }
+        }
+
+// 1b. Bullet va chạm với BossEnemy
+        for (Bullet bullet : bullets) {
+            if (bullet.isDead()) continue;
+
+            for (BossEnemy boss : bossEnemies) {
+                if (boss.isDead()) continue;
+
+                if (bullet.getBounds().intersects(boss.getBounds())) {
+                    bullet.setDead(true);
+                    boss.takeDamage();
+
+                    if (boss.isDead()) {
+                        score += 100;
+                        bossExists = false;
+                        gameRunning = false;
+                        showTempMessage("You Win!", WIDTH / 2.0 - 50, HEIGHT / 2.0, 2);
+
+                        // Chuyển sang menu sau 2 giây (trùng với thời gian hiển thị message)
+                        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                        delay.setOnFinished(e -> primaryStage.setScene(new Scene(createMenu(), WIDTH, HEIGHT)));
+                        delay.play();
                     }
-                    break;  // bullet chỉ trúng 1 enemy 1 lần
+
+                    break;
                 }
             }
         }
@@ -172,9 +200,9 @@ public class SpaceShooter extends Application {
 
             if (powerUp.getBounds().intersects(player.getBounds())) {
                 powerUp.setDead(true);
-                // Áp dụng hiệu ứng power-up cho player, ví dụ tăng điểm hoặc máu
+                // Áp dụng hiệu ứng power-up cho player
                 score += 20;
-                numLives = Math.min(numLives + 1, 5); // max 5 lives giả sử
+                numLives = Math.min(numLives + 1, 5); // max 5
             }
         }
 
@@ -216,50 +244,66 @@ public class SpaceShooter extends Application {
     // UI and game state methods
 
     private void showLosingScreen() {
-        Pane losingPane = new Pane();
-        losingPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
-        //them hieu ung fade in
-        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5),losingPane);
+        VBox losingLayout = new VBox(20);
+        losingLayout.setAlignment(Pos.CENTER);
+        losingLayout.setPrefSize(WIDTH, HEIGHT);
+        losingLayout.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+
+// Hiệu ứng fade in
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), losingLayout);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
         fadeIn.play();
-        //Label "Game over"
+
+// Label "Game Over"
         Label gameOverLabel = new Label("GAME OVER");
         gameOverLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: red; -fx-font-weight: bold;");
-        gameOverLabel.setLayoutX(WIDTH / 2 - 100);
-        gameOverLabel.setLayoutY(HEIGHT / 2 - 100);
-        //Label diem so
+
+// Label điểm số
         Label finalScoreLabel = new Label("Final Score: " + score);
         finalScoreLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
-        finalScoreLabel.setLayoutX(WIDTH / 2 - 80);
-        finalScoreLabel.setLayoutY(HEIGHT / 2 - 30);
-        // nut play again
+
+// Nút "Play Again"
         Button playAgainButton = new Button("Play Again");
         playAgainButton.setStyle("-fx-font-size: 16px; -fx-background-color: #4CAF50; -fx-text-fill: white;");
-        playAgainButton.setLayoutX(WIDTH / 2 - 100);
-        playAgainButton.setLayoutY(HEIGHT / 2 + 20);
         playAgainButton.setOnAction(e -> restartGame());
-        // nut back to menu
+
+// Nút "Back to Menu"
         Button menuButton = new Button("Back to Menu");
         menuButton.setStyle("-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;");
-        menuButton.setLayoutX(WIDTH / 2 - 100);
-        menuButton.setLayoutY(HEIGHT / 2 + 70);
         menuButton.setOnAction(e -> {
             primaryStage.setScene(new Scene(createMenu(), WIDTH, HEIGHT));
         });
 
-        losingPane.getChildren().addAll(gameOverLabel, finalScoreLabel, playAgainButton, menuButton);
-        root.getChildren().add(losingPane);
-        // TODO: display Game Over screen with score and buttons
+// Thêm các thành phần vào VBox
+        losingLayout.getChildren().addAll(gameOverLabel, finalScoreLabel, playAgainButton, menuButton);
+
+// Thêm VBox vào root
+        root.getChildren().add(losingLayout);
+
     }
 
     private void restartGame() {
+        if (gameTimer != null) {
+            gameTimer.stop(); // Dừng AnimationTimer cũ
+        }
+        root.getChildren().clear();
+        // Reset các biến trạng thái
+        score = 0;
+        numLives = 3;
+        bossExists = false;
+        gameRunning = true;
+        // Khởi động lại game
+        startGame();
         // TODO: reset gameObjects, lives, score and switch back to game scene
     }
 
     private void resetGame() {
         gameRunning = false;
         showLosingScreen();
+        if (gameTimer != null) {
+            gameTimer.stop(); // Dừng vòng lặp game hiện tại
+        }
         // TODO: stop game loop and call showLosingScreen
     }
 
@@ -356,8 +400,18 @@ public class SpaceShooter extends Application {
     }
 
     private void showTempMessage(String message, double x, double y, double duration) {
-        // TODO: show temporary on-screen message for duration seconds
+        Label tempLabel = new Label(message);
+        tempLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: yellow; -fx-font-weight: bold;");
+        tempLabel.setLayoutX(x);
+        tempLabel.setLayoutY(y);
+
+        root.getChildren().add(tempLabel);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(duration));
+        pause.setOnFinished(e -> root.getChildren().remove(tempLabel));
+        pause.play();
     }
+
 
     private void startGame() {
         gameRunning = true;
@@ -403,7 +457,7 @@ public class SpaceShooter extends Application {
         initEventHandlers(scene);
 
         // Game loop
-        AnimationTimer timer = new AnimationTimer() {
+        gameTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (!gameRunning) return;
@@ -452,6 +506,19 @@ public class SpaceShooter extends Application {
                     }
                 }
 
+                bossEnemies.removeIf(BossEnemy :: isDead);
+                for (BossEnemy boss : bossEnemies) {
+                    if (!boss.isDead()) {
+                        boss.update();
+
+                        // Kiểm tra thời gian bắn
+                        if (now - boss.getLastShootTime() >= boss.getShootInterval()) {
+                            boss.shoot(enemyBullets);
+                            boss.setLastShootTime(now);
+                        }
+                    }
+                }
+
                 // Kiểm tra va chạm
                 checkCollisions();
 
@@ -460,6 +527,7 @@ public class SpaceShooter extends Application {
 
                 // Vẽ lại màn hình
                 gc.clearRect(0, 0, WIDTH, HEIGHT);
+                gc.drawImage(backgroundImage, 0, 0, WIDTH, HEIGHT);
 
                 if (!player.isDead()) {
                     player.render(gc);
@@ -489,12 +557,20 @@ public class SpaceShooter extends Application {
                     }
                 }
 
+                for (BossEnemy boss : bossEnemies) {
+                    if (!boss.isDead()) {
+                        boss.render(gc);
+                    }
+                }
+
                 // Cập nhật UI
                 scoreLabel.setText("Score: " + score);
                 livesLabel.setText("Lives: " + numLives);
             }
         };
-        timer.start();
+        gameTimer.start();
     }
+
+
 
 }

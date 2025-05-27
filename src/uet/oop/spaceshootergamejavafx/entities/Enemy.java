@@ -14,7 +14,7 @@ public class Enemy extends GameObject {
     protected static final int HEIGHT = 30;
 
     // Movement speed
-    public static double SPEED = 1;
+    public static double SPEED = 0.5;
 
     // Flag to indicate if enemy should be removed
     private boolean dead;

@@ -22,15 +22,23 @@ public class BossEnemy extends Enemy {
     // Horizontal movement speed
     private double horizontalSpeed;
     private Image sprite;
+    private long lastShootTime = 0;
+    private final long shootInterval = 2_000_000_000L;
+
+    public long getLastShootTime() { return lastShootTime; }
+    public void setLastShootTime(long t) { lastShootTime = t; }
+    public long getShootInterval() { return shootInterval; }
 
     /**
      * Constructs a BossEnemy at the given coordinates.
      * @param x initial X position
      * @param y initial Y position
      */
+
+
     public BossEnemy(double x, double y) {
         super(x, y);
-        this.health = 100;
+        this.health = 25;
         this.horizontalSpeed = 2;
         this.sprite = new Image(getClass().getResource("/img/boss.png").toExternalForm());
 
@@ -42,7 +50,6 @@ public class BossEnemy extends Enemy {
      */
     @Override
     public void update() {
-        // TODO: implement vertical and horizontal movement
         x += horizontalSpeed;
         if (x <= WIDTH / 2 || x >= 800 - WIDTH / 2) {
             horizontalSpeed = -horizontalSpeed;

@@ -14,7 +14,7 @@ public class PowerUp extends GameObject {
     public static final int HEIGHT = 20;
 
     // Fall speed of the power-up
-    private static final double SPEED = 2;
+    private static final double SPEED = 0.5;
 
     // Flag indicating whether the power-up should be removed
     private boolean dead;
