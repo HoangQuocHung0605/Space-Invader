@@ -51,7 +51,7 @@ public class BossEnemy extends Enemy {
     @Override
     public void update() {
         x += horizontalSpeed;
-        if (x <= WIDTH / 2 || x >= 800 - WIDTH / 2) {
+        if (x <= WIDTH / 2 || x >= 350 - WIDTH / 2) {
             horizontalSpeed = -horizontalSpeed;
         }
 
