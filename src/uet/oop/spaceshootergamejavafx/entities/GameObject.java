@@ -1,7 +1,9 @@
 package uet.oop.spaceshootergamejavafx.entities;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.geometry.Bounds;
+import javafx.scene.shape.Rectangle;
 
 /**
  * Skeleton for GameObject. Base class for all game objects.
@@ -86,4 +88,5 @@ public abstract class GameObject {
      * @return height
      */
     public abstract double getHeight();
+
 }
