@@ -367,7 +367,18 @@ public class SpaceShooter extends Application {
     }
 
     private void showTempMessage(String message, double x, double y, double duration) {
-        // TODO: show temporary on-screen message for duration seconds
+        Label tempLabel = new Label(message);
+        tempLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: yellow; -fx-font-weight: bold;");
+        tempLabel.setLayoutX(x);
+        tempLabel.setLayoutY(y);
+
+        root.getChildren().add(tempLabel);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.seconds(duration), tempLabel);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(e -> root.getChildren().remove(tempLabel));
+        fadeOut.play();
     }
 
     private void startGame() {
